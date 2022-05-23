@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Catamaran:wght@400;700&display=swap');
+:root{
+    --blue:#2680c0;
+    --blue-light:#85c6f4;
+    --light:#f1f5f8;
+    --dark:#102a42;
+    --gray:#3b4954;
+    --red:#bb2525;
+    --red-light:#e66b6b;
+
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    font-family: 'Catamaran', sans-serif;
+}
+.container{
+    width: 100%;
+    max-width: 1366px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+.header{
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 232px;
+    margin-bottom: 20px;
+    background: var(--blue);
+    color: var(--light);
+}
+.header-title h3{
+    font-size:2rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: capitalize;
+}
+.header-cart{
+font-size: 2.5rem;
+position: relative;
+
+}
+.header-cart-amount{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--blue-light);
+    position: absolute;
+    top: 0;
+    right: -20%;
+    font-size: 1.5rem;
+}
