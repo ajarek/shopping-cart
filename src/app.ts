@@ -1,23 +1,43 @@
-let totalArray: Array<number> = [];
-const container = document.querySelector(".grid-container")as HTMLElement;
-const totalPrice = document.querySelector(".total-price")as HTMLElement;
+(function () {
+  let totalArray: Array<number> = [];
+  const container = document.querySelector(".grid-container") as HTMLElement;
+  const totalPrice = document.querySelector(".total-price") as HTMLElement;
+  const clearCartButton = document.querySelector(".clear-cart") as HTMLElement;
+  const wrapperContent = document.querySelector(".wrapper-content") as HTMLElement;
 
-async function getData(): Promise<void> {
+  async function getData(): Promise<void> {
     const response = await fetch("./data.json");
     const data = await response.json();
-    
-    data.forEach((el: any) => {
-        totalArray.push(el.price*el.amount);
-        const item = creatItem(el.model, el.price, el.amount, el.action, el.image);
-        container.appendChild(item);
-     
-    });
-    totalPrice.innerHTML='$'+totalArray.reduce((a, b) => a + b, 0).toFixed(2).toString()
-  }
- getData();
 
- 
-function creatItem(model:string,price:number,amount:number,action:string,image:string): HTMLElement {
+    data.forEach((el: any) => {
+      totalArray.push(el.price * el.amount);
+      const item = creatItem(
+        el.model,
+        el.price,
+        el.amount,
+        el.action,
+        el.image
+      );
+      container.appendChild(item);
+    });
+    totalPrice.innerHTML =
+      "$" +
+      totalArray
+        .reduce((a, b) => a + b, 0)
+        .toFixed(2)
+        .toString();
+    clearCart();
+    quantityHandling();
+    quantityHandlingCart();
+  }
+
+  function creatItem(
+    model: string,
+    price: number,
+    amount: number,
+    action: string,
+    image: string
+  ): HTMLElement {
     const gridItem = document.createElement("div");
     gridItem.classList.add("grid-item");
     const itemImage = document.createElement("div");
@@ -31,28 +51,113 @@ function creatItem(model:string,price:number,amount:number,action:string,image:s
     const textModel = document.createElement("p");
     textModel.innerHTML = model;
     const textPrice = document.createElement("p");
-    textPrice.innerHTML ='$'+ price.toString();
+    textPrice.innerHTML = "$" + price.toString();
     const removeButton = document.createElement("button");
-    removeButton.innerHTML =action;
+    removeButton.innerHTML = action;
     removeButton.addEventListener("click", () => {
-        totalArray.splice(totalArray.indexOf(price*amount), 1);
-        totalPrice.innerHTML=totalArray.reduce((a, b) => a + b, 0).toFixed(2).toString()
-        gridItem.remove();
+      totalArray.splice(totalArray.indexOf(price * amount), 1);
+      totalPrice.innerHTML = totalArray
+        .reduce((a, b) => a + b, 0)
+        .toFixed(2)
+        .toString();
+
+      gridItem.remove();
+      quantityHandlingCart();
     });
 
     const amountContainer = document.createElement("div");
     amountContainer.classList.add("amount-container");
     const upButton = document.createElement("button");
+    upButton.setAttribute("id", "up");
     upButton.innerHTML = "&#10095;";
     const amountSpan = document.createElement("span");
     amountSpan.innerHTML = amount.toString();
+    amountSpan.setAttribute("data-price", price.toString());
     amountSpan.classList.add("amount");
     const downButton = document.createElement("button");
+    downButton.setAttribute("id", "down");
     downButton.innerHTML = "&#10094;";
 
     itemImage.appendChild(img);
     itemInfo.append(textModel, textPrice, removeButton);
-    amountContainer.append(upButton,amountSpan, downButton);
+    amountContainer.append(upButton, amountSpan, downButton);
     gridItem.append(itemImage, itemInfo, amountContainer);
     return gridItem;
-}
+  }
+
+  function clearCart() {
+    clearCartButton.addEventListener("click", () => {
+      totalArray = [];
+      wrapperContent.innerHTML = `<p>is currently empty</p>`;
+      quantityHandlingCart();
+    });
+  }
+  
+  function quantityHandling() {
+    const upButton = document.querySelectorAll(
+      "#up"
+    ) as NodeListOf<HTMLElement>;
+    const downButton = document.querySelectorAll(
+      "#down"
+    ) as NodeListOf<HTMLElement>;
+    const amountSpan = document.querySelectorAll(
+      ".amount"
+    ) as NodeListOf<HTMLElement>;
+
+    upButton.forEach((el, index) => {
+      let priceCurrent = amountSpan[index].dataset.price;
+      el.addEventListener("click", () => {
+        amountSpan[index].innerHTML = (
+          parseInt(amountSpan[index].innerHTML) + 1
+        ).toString();
+        if (parseInt(amountSpan[index].innerHTML) > 20) {
+          amountSpan[index].innerHTML = "1";
+        }
+        totalArray[index] =
+          Number(priceCurrent) * parseInt(amountSpan[index].innerHTML);
+        totalPrice.innerHTML = totalArray
+          .reduce((a, b) => a + b, 0)
+          .toFixed(2)
+          .toString();
+        quantityHandlingCart();
+      });
+    });
+
+    downButton.forEach((el, index) => {
+      let priceCurrent = amountSpan[index].dataset.price;
+      el.addEventListener("click", () => {
+        amountSpan[index].innerHTML = (
+          parseInt(amountSpan[index].innerHTML) - 1
+        ).toString();
+        if (amountSpan[index].innerHTML <= "0") {
+          amountSpan[index].innerHTML = "1";
+        }
+        totalArray[index] =
+          Number(priceCurrent) * parseInt(amountSpan[index].innerHTML);
+        totalPrice.innerHTML = totalArray
+          .reduce((a, b) => a + b, 0)
+          .toFixed(2)
+          .toString();
+        quantityHandlingCart();
+      });
+    });
+  }
+
+  function quantityHandlingCart() {
+    const headerCartAmount = document.querySelector(
+      ".header-cart-amount"
+    ) as HTMLElement;
+    let sum = 0;
+    const amountAll = document.querySelectorAll(
+      ".amount"
+    ) as NodeListOf<HTMLElement>;
+    amountAll.forEach((el, index) => {
+      sum += Number(el.innerHTML);
+    });
+    headerCartAmount.innerHTML = sum.toString();
+  }
+  function init() {
+    getData();
+  }
+  return init();
+})();
