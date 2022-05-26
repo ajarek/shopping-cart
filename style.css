@@ -195,9 +195,7 @@ body {
   .main-header h1 {
     font-size: 1.5rem;
   }
-  .grid-item {
-    grid-template-columns: 1fr 2fr 1fr;
-  }
+  
   .item-image {
     padding: 1.5rem;
   }
